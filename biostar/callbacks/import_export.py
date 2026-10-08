@@ -23,6 +23,23 @@ from biostar.modules.data import (
     parse_pps_upload,
 )
 
+_FORMULA_TRIGGERS = ("=", "+", "-", "@")
+
+
+def _safe_cell_value(v):
+    """Neutralize spreadsheet formula injection (CWE-1236) on export.
+
+    openpyxl stores any string beginning with '=' as a live formula, and
+    Excel/Sheets likewise treat leading '+', '-' and '@' as formula starts.
+    Cell values can originate from imported workbooks (free-text fields),
+    so prefix such strings with an apostrophe to force text storage.
+    Security fix applied 2026-10-08 — see docs/security-review-2026-10-08.md.
+    """
+
+    if isinstance(v, str) and v.lstrip(" \t\r\n")[:1] in _FORMULA_TRIGGERS:
+        return "'" + v
+    return v
+
 
 def validate_hardware_joint(hardware_list: list[dict]) -> list:
     """Check to make sure the provided hardware elements are (jointly) valid"""
@@ -191,7 +208,7 @@ def attach_callbacks(app: Dash):
                         k, get_ppel_row_mode(data) if sheet == "PPEL" else None
                     )
                     cell.fill = copy(style_source.fill)
-                    cell.value = v
+                    cell.value = _safe_cell_value(v)
 
             # Clear any remaining dummy data
             for row in ws.iter_rows(min_row=(2 + len(rows)), max_row=ws.max_row):

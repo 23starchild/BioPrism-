@@ -838,6 +838,7 @@ IMPORT_HARDWARE_MODAL = dmc.Modal(
                     span=6,
                     children=dcc.Upload(
                         id="upload-import-hardware",
+                        max_size=25_000_000,
                         children=dmc.Button("Upload PPEL File", w="100%", color="teal.8"),
                     ),
                 ),
@@ -938,6 +939,7 @@ IMPORT_SAMPLES_MODAL = dmc.Modal(
                     span=6,
                     children=dcc.Upload(
                         id="upload-import-samples",
+                        max_size=25_000_000,
                         children=dmc.Button("Upload PPS File", w="100%", color="teal.8"),
                     ),
                 ),

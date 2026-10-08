@@ -29,4 +29,7 @@ app.layout = dmc.MantineProvider([dmc.NotificationProvider(), layout])
 attach_callbacks(app)
 
 if __name__ == "__main__":
-    app.run(debug=(os.getenv("MODE") != "production"))
+    # Debug is opt-in only: the Werkzeug debugger must never be enabled
+    # merely because MODE is unset or set to anything other than an
+    # explicit development value. Security fix 2026-10-08.
+    app.run(debug=(os.getenv("MODE") == "development"))
